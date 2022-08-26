@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'sycamore/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'sycamore'
+  spec.name          = 'outstand-sycamore'
   spec.version       = Sycamore::VERSION
-  spec.authors       = ['Marcel Otto']
-  spec.email         = ['marcelotto@gmx.de']
+  spec.authors       = ['Marcel Otto', 'Ryan Schlesinger']
+  spec.email         = ['ryan@outstand.com']
 
   spec.summary       = %q{An unordered tree data structure for Ruby.}
   spec.description   = %q{Sycamore is an unordered tree data structure.}
-  spec.homepage      = 'https://github.com/marcelotto/sycamore'
+  spec.homepage      = 'https://github.com/outstand/sycamore'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.1'
+  spec.required_ruby_version = '>= 2.7'
 
   spec.add_development_dependency 'bundler', '~> 2'
   spec.add_development_dependency 'rake', '~> 13.0'
