@@ -1340,14 +1340,14 @@ module Sycamore
     #
     # @return [Hash]
     #
-    def to_h(*args)
+    def to_h(...)
       return {} if empty?
 
       # not the nicest, but fastest way to inject on hashes, as noted here:
       # http://stackoverflow.com/questions/3230863/ruby-rails-inject-on-hashes-good-style
       hash = {}
       data.each do |node, child|
-        hash[node] = child.to_native_object(*args)
+        hash[node] = child.to_native_object(...)
       end
 
       hash
@@ -1442,7 +1442,6 @@ module Sycamore
     #
     def dup
       duplicate = self.class.new.add(self)
-      duplicate.taint if tainted?
       duplicate
     end
 

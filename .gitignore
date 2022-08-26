@@ -1,7 +1,6 @@
 /.bundle/
 /.yardoc
 /Gemfile.lock
-/.ruby-version
 /_yardoc/
 /coverage/
 /doc
@@ -10,3 +9,8 @@
 /spec/examples.txt
 /tmp/
 
+
+# Devenv
+.devenv*
+devenv.local.nix
+.direnv*
