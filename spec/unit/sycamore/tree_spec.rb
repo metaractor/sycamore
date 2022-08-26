@@ -544,14 +544,6 @@ describe Sycamore::Tree do
 
       expect( duplicate ).not_to be_frozen
     end
-
-    it 'returns a tainted tree, if the original was tainted' do
-      tree = Sycamore::Tree.new
-      tree.taint
-      duplicate = tree.dup
-
-      expect( duplicate ).to be_tainted
-    end
   end
 
   ############################################################################
@@ -585,14 +577,6 @@ describe Sycamore::Tree do
       klone = tree.clone
 
       expect( klone ).to be_frozen
-    end
-
-    it 'returns a tainted tree, if the original was tainted' do
-      tree = Sycamore::Tree.new
-      tree.taint
-      klone = tree.clone
-
-      expect( klone ).to be_tainted
     end
 
     it 'does copy singleton methods' do
