@@ -1,0 +1,35 @@
+services:
+  sycamore:
+    build: .
+    image: outstand/sycamore:dev
+    stdin_open: true
+    tty: true
+    environment:
+      FIXUID:
+      FIXGID:
+      BUILDKITE:
+      BUILDKITE_BUILD_URL:
+      BUILDKITE_JOB_ID:
+      BUILDKITE_AGENT_ACCESS_TOKEN:
+    volumes:
+      - bundler-data:/usr/local/bundle
+      - .:/sycamore
+
+  release:
+    image: outstand/sycamore:dev
+    stdin_open: true
+    tty: true
+    command: rake release
+    environment:
+      FIXUID:
+      FIXGID:
+    volumes:
+      - bundler-data:/usr/local/bundle
+      - ~/.gitconfig:/home/sycamore/.gitconfig
+      - ~/.gitconfig.user:/home/sycamore/.gitconfig.user
+      - ~/.config/gh/hosts.yml:/home/sycamore/.config/gh/hosts.yml
+      - ~/.local/share/gem/credentials:/home/sycamore/.local/share/gem/credentials
+      - ~/.local/share/gem/credentials:/home/sycamore/.gem/credentials
+
+volumes:
+  bundler-data:

@@ -1,0 +1,7 @@
+rspec() {
+  docker compose run --rm sycamore rspec "$@"
+}
+
+bundle() {
+  docker compose run --rm sycamore bundle "$@"
+}
