@@ -1,2 +1,2 @@
-$LOAD_PATH << 'lib'
-require 'sycamore/extension'
+$LOAD_PATH << "lib"
+require "sycamore/extension"

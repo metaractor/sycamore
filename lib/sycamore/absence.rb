@@ -1,7 +1,6 @@
-require 'delegate'
+require "delegate"
 
 module Sycamore
-
   ##
   # An Absence object represents the absence of a specific child {Sycamore::Tree}.
   #
@@ -21,7 +20,6 @@ module Sycamore
   # implementation of the parent tree and the parent node.
   #
   class Absence < Delegator
-
     ##
     # @api private
     #
@@ -30,7 +28,7 @@ module Sycamore
     end
 
     class << self
-      alias at new
+      alias_method :at, :new
     end
 
     ########################################################################
@@ -46,7 +44,7 @@ module Sycamore
       @tree or Nothing
     end
 
-    alias __getobj__ presence
+    alias_method :__getobj__, :presence
 
     ##
     # @api private
@@ -96,17 +94,17 @@ module Sycamore
       if absent?
         # TODO: This is duplication of Tree#child_at! How can we remove it, without introducing a module for this single method or inherit from Tree?
         case path.length
-          when 0 then raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
-          when 1 then child_of(*path)
-          else child_of(path[0]).child_at(*path[1..-1])
+        when 0 then raise ArgumentError, "wrong number of arguments (given 0, expected 1+)"
+        when 1 then child_of(*path)
+        else child_of(path[0]).child_at(*path[1..])
         end
       else
         presence.child_at(*path)
       end
     end
 
-    alias [] child_at
-    alias dig child_at
+    alias_method :[], :child_at
+    alias_method :dig, :child_at
 
     ##
     # A developer-friendly string representation of the absent tree.
@@ -114,7 +112,7 @@ module Sycamore
     # @return [String]
     #
     def inspect
-      "#{absent? ? 'absent' : 'present'} child of node #{@parent_node.inspect} in #{@parent_tree.inspect}"
+      "#{absent? ? "absent" : "present"} child of node #{@parent_node.inspect} in #{@parent_tree.inspect}"
     end
 
     ##
@@ -174,6 +172,5 @@ module Sycamore
         end
       end
     end
-
   end
 end

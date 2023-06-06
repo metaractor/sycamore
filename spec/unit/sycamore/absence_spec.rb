@@ -1,25 +1,24 @@
 describe Sycamore::Absence do
-
   let(:parent_node) { :missing }
   let(:parent_tree) { Sycamore::Tree.new }
   let(:absent_tree) { Sycamore::Absence.new(parent_tree, parent_node) }
 
   ############################################################################
 
-  describe '#presence' do
-    context 'when the absent tree has not been created' do
-      it 'does return the Nothing tree' do
-        expect( absent_tree.presence ).to be Sycamore::Nothing
+  describe "#presence" do
+    context "when the absent tree has not been created" do
+      it "does return the Nothing tree" do
+        expect(absent_tree.presence).to be Sycamore::Nothing
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does return the created tree' do
-        expect( absent_tree.presence ).to be_a Sycamore::Tree
-        expect( absent_tree.presence ).not_to be Sycamore::Nothing
-        expect( absent_tree.presence ).not_to be_a Sycamore::Absence
+      it "does return the created tree" do
+        expect(absent_tree.presence).to be_a Sycamore::Tree
+        expect(absent_tree.presence).not_to be Sycamore::Nothing
+        expect(absent_tree.presence).not_to be_a Sycamore::Absence
       end
     end
   end
@@ -28,77 +27,77 @@ describe Sycamore::Absence do
   # Absence and Nothing predicates
   ############################################################################
 
-  describe '#nothing?' do
-    context 'when the absent tree has not been created' do
-      specify { expect( absent_tree.nothing? ).to be false }
+  describe "#nothing?" do
+    context "when the absent tree has not been created" do
+      specify { expect(absent_tree.nothing?).to be false }
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      specify { expect( absent_tree.nothing? ).to be false }
+      specify { expect(absent_tree.nothing?).to be false }
     end
   end
 
   ############################################################################
 
-  describe '#absent?' do
-    context 'when the absent tree has not been created' do
-      specify { expect( absent_tree.absent? ).to be true }
+  describe "#absent?" do
+    context "when the absent tree has not been created" do
+      specify { expect(absent_tree.absent?).to be true }
     end
 
-    context 'when the absent tree has been created' do
-      context 'when it is blank' do
+    context "when the absent tree has been created" do
+      context "when it is blank" do
         before(:each) { absent_tree.add(1).delete(1) }
 
-        specify { expect( absent_tree.absent? ).to be false }
+        specify { expect(absent_tree.absent?).to be false }
       end
 
-      context 'when it contains data' do
+      context "when it contains data" do
         before(:each) { absent_tree.add :something }
 
-        specify { expect( absent_tree.absent? ).to be false }
+        specify { expect(absent_tree.absent?).to be false }
       end
     end
   end
 
   ############################################################################
 
-  describe '#existent?' do
-    context 'when the absent tree has not been created' do
-      specify { expect( absent_tree.existent? ).to be false }
+  describe "#existent?" do
+    context "when the absent tree has not been created" do
+      specify { expect(absent_tree.existent?).to be false }
     end
 
-    context 'when the absent tree has been created' do
-      context 'when it is blank' do
+    context "when the absent tree has been created" do
+      context "when it is blank" do
         before(:each) { absent_tree.add(1).delete(1) }
 
-        specify { expect( absent_tree.existent? ).to be true }
+        specify { expect(absent_tree.existent?).to be true }
       end
 
-      context 'when it contains data' do
+      context "when it contains data" do
         before(:each) { absent_tree.add :something }
 
-        specify { expect( absent_tree.existent? ).to be true }
+        specify { expect(absent_tree.existent?).to be true }
       end
     end
   end
 
   ############################################################################
 
-  describe '#present?' do
-    context 'when the absent tree has not been created' do
-      specify { expect( absent_tree.present? ).to be false }
+  describe "#present?" do
+    context "when the absent tree has not been created" do
+      specify { expect(absent_tree.present?).to be false }
     end
 
-    context 'when the absent tree has been created' do
-      context 'when it is blank' do
+    context "when the absent tree has been created" do
+      context "when it is blank" do
         before(:each) { absent_tree.add Sycamore::Nothing }
-        specify { expect( absent_tree.present? ).to be false }
+        specify { expect(absent_tree.present?).to be false }
       end
-      context 'when it contains data' do
+      context "when it contains data" do
         before(:each) { absent_tree.add :something }
-        specify { expect( absent_tree.present? ).to be true }
+        specify { expect(absent_tree.present?).to be true }
       end
     end
   end
@@ -109,57 +108,57 @@ describe Sycamore::Absence do
 
   COMMAND_METHODS_RETURN_SPECIAL_CASES = [:[]=]
 
-  shared_examples_for 'with and without the parent node' do
-    context 'when the node is present, but the child tree absent' do
+  shared_examples_for "with and without the parent node" do
+    context "when the node is present, but the child tree absent" do
       before(:each) { present_root_tree << parent_node }
 
-      include_examples 'direct and nested absence'
+      include_examples "direct and nested absence"
     end
 
-    context 'when the node and child tree are absent' do
-      include_examples 'direct and nested absence'
+    context "when the node and child tree are absent" do
+      include_examples "direct and nested absence"
     end
   end
 
-  shared_examples_for 'direct and nested absence' do
-    context 'when the parent is present' do
+  shared_examples_for "direct and nested absence" do
+    context "when the parent is present" do
       let(:parent_tree) { present_root_tree }
 
-      it_behaves_like 'every command method call'
+      it_behaves_like "every command method call"
     end
 
-    context 'when the parent itself is absent' do
+    context "when the parent itself is absent" do
       let(:parent_tree) { Sycamore::Absence.new(present_root_tree, root_node) }
       let(:parent_node) { :other_missing }
 
-      it_behaves_like 'every command method call'
+      it_behaves_like "every command method call"
 
-      it 'does add the absent parent to the root tree' do
+      it "does add the absent parent to the root tree" do
         method_call.call
 
-        expect( present_root_tree )
-          .to include_tree( root_node => { parent_node => absent_tree} )
+        expect(present_root_tree)
+          .to include_tree(root_node => {parent_node => absent_tree})
       end
     end
   end
 
-  shared_examples_for 'every command method call' do
-    it 'does create and return a real tree' do
+  shared_examples_for "every command method call" do
+    it "does create and return a real tree" do
       unless COMMAND_METHODS_RETURN_SPECIAL_CASES.include? command_method_name
         created_tree = method_call.call
 
-        expect( created_tree ).to be_a Sycamore::Tree
-        expect( created_tree ).not_to be absent_tree
-        expect( created_tree ).not_to be_a Sycamore::Absence
-        expect( created_tree ).to be absent_tree.presence
+        expect(created_tree).to be_a Sycamore::Tree
+        expect(created_tree).not_to be absent_tree
+        expect(created_tree).not_to be_a Sycamore::Absence
+        expect(created_tree).to be absent_tree.presence
       end
     end
 
-    it 'does add the created tree to the parent tree' do
+    it "does add the created tree to the parent tree" do
       method_call.call
 
-      expect( parent_tree )
-        .to include_tree( parent_node => absent_tree )
+      expect(parent_tree)
+        .to include_tree(parent_node => absent_tree)
     end
 
     # it 'does delegate the command method call to the created tree' do
@@ -167,89 +166,89 @@ describe Sycamore::Absence do
     # end
   end
 
-  shared_examples_for 'command method calls under different circumstances' do |command_method, *args|
+  shared_examples_for "command method calls under different circumstances" do |command_method, *args|
     let(:command_method_name) { command_method }
     let(:method_call) do
       proc { absent_tree.send(command_method, *args) }
     end
 
     let(:present_root_tree) { Sycamore::Tree.new }
-    let(:root_node)         { :missing }
-    let(:parent_node)       { root_node }
-    let(:absent_tree)       { Sycamore::Absence.new(parent_tree, parent_node) }
+    let(:root_node) { :missing }
+    let(:parent_node) { root_node }
+    let(:absent_tree) { Sycamore::Absence.new(parent_tree, parent_node) }
 
-    include_examples 'with and without the parent node'
+    include_examples "with and without the parent node"
   end
 
   ############################################################################
 
-  describe '#add' do
-    include_examples 'command method calls under different circumstances', :add, :foo
-    include_examples 'command method calls under different circumstances', :add, nil
-    include_examples 'command method calls under different circumstances', :add, Sycamore::Nothing
+  describe "#add" do
+    include_examples "command method calls under different circumstances", :add, :foo
+    include_examples "command method calls under different circumstances", :add, nil
+    include_examples "command method calls under different circumstances", :add, Sycamore::Nothing
 
-    it 'does execute the #add on the created tree' do
-      expect( absent_tree.add(:foo)          ).to include_node :foo
-      expect( absent_tree[:nested].add(:foo) ).to include_node :foo
+    it "does execute the #add on the created tree" do
+      expect(absent_tree.add(:foo)).to include_node :foo
+      expect(absent_tree[:nested].add(:foo)).to include_node :foo
     end
   end
 
   ############################################################################
 
-  describe '#replace' do
-    include_examples 'command method calls under different circumstances', :replace, :foo
-    include_examples 'command method calls under different circumstances', :replace, nil
-    include_examples 'command method calls under different circumstances', :replace, Sycamore::Nothing
+  describe "#replace" do
+    include_examples "command method calls under different circumstances", :replace, :foo
+    include_examples "command method calls under different circumstances", :replace, nil
+    include_examples "command method calls under different circumstances", :replace, Sycamore::Nothing
 
-    it 'does execute the #replace on the created tree' do
-      expect( absent_tree.replace(:foo) ).to include_node :foo
+    it "does execute the #replace on the created tree" do
+      expect(absent_tree.replace(:foo)).to include_node :foo
     end
   end
 
   ############################################################################
 
-  describe '#[]=' do
-    include_examples 'command method calls under different circumstances', :[]=, :foo, :bar
-    include_examples 'command method calls under different circumstances', :[]=, :foo, nil
-    include_examples 'command method calls under different circumstances', :[]=, :foo, Sycamore::Nothing
+  describe "#[]=" do
+    include_examples "command method calls under different circumstances", :[]=, :foo, :bar
+    include_examples "command method calls under different circumstances", :[]=, :foo, nil
+    include_examples "command method calls under different circumstances", :[]=, :foo, Sycamore::Nothing
 
-    it 'does execute the #[]= on the created tree' do
+    it "does execute the #[]= on the created tree" do
       absent_tree[:foo] = :bar
 
-      expect( absent_tree.presence ).to include_tree foo: :bar
+      expect(absent_tree.presence).to include_tree foo: :bar
     end
   end
 
   ############################################################################
 
-  describe '#freeze' do
-    include_examples 'command method calls under different circumstances', :freeze
+  describe "#freeze" do
+    include_examples "command method calls under different circumstances", :freeze
 
-    it 'does freeze the Absence object and the created tree' do
+    it "does freeze the Absence object and the created tree" do
       absent_tree.freeze
 
-      expect( absent_tree.presence.freeze ).to be_frozen
-      expect( absent_tree ).to be_frozen
+      expect(absent_tree.presence.freeze).to be_frozen
+      expect(absent_tree).to be_frozen
     end
   end
 
   ############################################################################
 
-  describe '#clear' do
-    context 'when the absent tree has not been created' do
-      it 'does nothing' do
+  describe "#clear" do
+    context "when the absent tree has not been created" do
+      it "does nothing" do
         expect { absent_tree.clear }.not_to change { absent_tree }
       end
 
-      it 'does return the absent tree' do
-        expect( absent_tree.clear ).to be absent_tree
+      it "does return the absent tree" do
+        expect(absent_tree.clear).to be absent_tree
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(absent_tree.presence).to receive(:clear)
         absent_tree.clear
       end
@@ -258,21 +257,21 @@ describe Sycamore::Absence do
 
   ############################################################################
 
-  describe '#delete' do
-    context 'when the absent tree has not been created' do
-      it 'does nothing' do
+  describe "#delete" do
+    context "when the absent tree has not been created" do
+      it "does nothing" do
         expect { absent_tree.delete 42 }.not_to change { absent_tree }
       end
 
-      it 'does return the absent tree' do
-        expect( absent_tree.delete 42 ).to be absent_tree
+      it "does return the absent tree" do
+        expect(absent_tree.delete(42)).to be absent_tree
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(absent_tree.presence).to receive(:delete)
         absent_tree.delete 42
       end
@@ -283,7 +282,7 @@ describe Sycamore::Absence do
   # query methods
   ############################################################################
 
-  let(:nothing) { spy('nothing') }
+  let(:nothing) { spy("nothing") }
 
   UNSUPPORTED_TEST_DOUBLE_METHODS = %i[hash to_s]
   EXCLUDE_QUERY_METHODS = %i[== === eql? dup clone] + UNSUPPORTED_TEST_DOUBLE_METHODS +
@@ -291,20 +290,20 @@ describe Sycamore::Absence do
 
   (Sycamore::Tree.query_methods - EXCLUDE_QUERY_METHODS).each do |query_method|
     describe "##{query_method}" do
-      context 'when the absent tree has not been created' do
-        it 'does delegate to Nothing' do
+      context "when the absent tree has not been created" do
+        it "does delegate to Nothing" do
           absent_tree.instance_variable_set(:@tree, nothing)
           absent_tree.send(query_method)
           expect(nothing).to have_received(query_method)
         end
       end
 
-      context 'when the absent tree has been created' do
+      context "when the absent tree has been created" do
         before(:each) { absent_tree.add :something }
 
         let(:created_tree) { absent_tree.presence }
 
-        it 'does delegate to the created tree' do
+        it "does delegate to the created tree" do
           expect(created_tree).to be_present
           expect(created_tree).to receive(query_method)
           absent_tree.send(query_method)
@@ -315,28 +314,28 @@ describe Sycamore::Absence do
 
   ############################################################################
 
-  describe '#child_of' do
-    context 'when the absent tree has not been created' do
-      it 'does return another absent tree' do
-        expect( absent_tree.child_of(:another) )
+  describe "#child_of" do
+    context "when the absent tree has not been created" do
+      it "does return another absent tree" do
+        expect(absent_tree.child_of(:another))
           .to be_a(Sycamore::Absence)
           .and be_absent
           .and be_different_to absent_tree
       end
 
-      context 'edge cases' do
-        it 'does treat nil like any other value' do
-          expect( absent_tree.child_of(nil) )
+      context "edge cases" do
+        it "does treat nil like any other value" do
+          expect(absent_tree.child_of(nil))
             .to be_a(Sycamore::Absence)
             .and be_absent
             .and be_different_to absent_tree
         end
 
-        it 'does raise an error, when given the Nothing tree' do
+        it "does raise an error, when given the Nothing tree" do
           expect { absent_tree.child_of(Sycamore::Nothing) }.to raise_error Sycamore::InvalidNode
         end
 
-        it 'does raise an error, when given an Enumerable' do
+        it "does raise an error, when given an Enumerable" do
           expect { absent_tree.child_of([1]) }.to raise_error Sycamore::InvalidNode
           expect { absent_tree.child_of([1, 2]) }.to raise_error Sycamore::InvalidNode
           expect { absent_tree.child_of(foo: :bar) }.to raise_error Sycamore::InvalidNode
@@ -345,11 +344,11 @@ describe Sycamore::Absence do
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
       let(:created_tree) { absent_tree.presence }
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(created_tree).to receive(:child_of)
         absent_tree.child_of(:something)
       end
@@ -358,28 +357,28 @@ describe Sycamore::Absence do
 
   ############################################################################
 
-  describe '#child_at' do
-    context 'when the absent tree has not been created' do
-      it 'does return another absent tree' do
-        expect( absent_tree[1,2,3] )
+  describe "#child_at" do
+    context "when the absent tree has not been created" do
+      it "does return another absent tree" do
+        expect(absent_tree[1, 2, 3])
           .to be_a(Sycamore::Absence)
           .and be_absent
           .and be_different_to absent_tree
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
       let(:created_tree) { absent_tree.presence }
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(created_tree).to receive(:child_at)
         absent_tree.child_at(:something)
       end
     end
 
-    it 'does raise an ArgumentError, when given no arguments' do
-      expect { absent_tree.child_at() }.to raise_error ArgumentError
+    it "does raise an ArgumentError, when given no arguments" do
+      expect { absent_tree.child_at }.to raise_error ArgumentError
     end
   end
 
@@ -387,78 +386,78 @@ describe Sycamore::Absence do
   # Equality
   ############################################################################
 
-  describe '#===' do
-    context 'when the absent tree has not been created' do
-      it 'does delegate to Nothing' do
-        expect( absent_tree === Sycamore::Nothing ).to be true
-        expect( Sycamore::Nothing === absent_tree ).to be true
+  describe "#===" do
+    context "when the absent tree has not been created" do
+      it "does delegate to Nothing" do
+        expect(absent_tree === Sycamore::Nothing).to be true
+        expect(Sycamore::Nothing === absent_tree).to be true
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree === Sycamore::Tree[:something] ).to be true
-        expect( Sycamore::Tree[:something] === absent_tree ).to be true
+      it "does delegate to the created tree" do
+        expect(absent_tree === Sycamore::Tree[:something]).to be true
+        expect(Sycamore::Tree[:something] === absent_tree).to be true
       end
     end
   end
 
   ############################################################################
 
-  describe '#==' do
-    context 'when the absent tree has not been created' do
-      it 'does delegate to Nothing' do
-        expect( absent_tree == Sycamore::Nothing ).to be true
-        expect( Sycamore::Nothing == absent_tree ).to be true
+  describe "#==" do
+    context "when the absent tree has not been created" do
+      it "does delegate to Nothing" do
+        expect(absent_tree == Sycamore::Nothing).to be true
+        expect(Sycamore::Nothing == absent_tree).to be true
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree == Sycamore::Tree[:something] ).to be true
-        expect( Sycamore::Tree[:something] == absent_tree ).to be true
+      it "does delegate to the created tree" do
+        expect(absent_tree == Sycamore::Tree[:something]).to be true
+        expect(Sycamore::Tree[:something] == absent_tree).to be true
       end
     end
   end
 
   ############################################################################
 
-  describe '#eql?' do
-    context 'when the absent tree has not been created' do
-      it 'does delegate to Nothing' do
-        expect( absent_tree.eql? Sycamore::Nothing ).to be true
-        expect( Sycamore::Nothing.eql? absent_tree ).to be true
+  describe "#eql?" do
+    context "when the absent tree has not been created" do
+      it "does delegate to Nothing" do
+        expect(absent_tree.eql?(Sycamore::Nothing)).to be true
+        expect(Sycamore::Nothing.eql?(absent_tree)).to be true
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree.eql? Sycamore::Tree[:something] ).to be true
-        expect( Sycamore::Tree[:something].eql? absent_tree ).to be true
+      it "does delegate to the created tree" do
+        expect(absent_tree.eql?(Sycamore::Tree[:something])).to be true
+        expect(Sycamore::Tree[:something].eql?(absent_tree)).to be true
       end
     end
   end
 
   ############################################################################
 
-  describe '#hash' do
-    context 'when the absent tree has not been created' do
-      it 'does delegate to Nothing' do
-        expect( absent_tree.hash ).to be Sycamore::Nothing.hash
+  describe "#hash" do
+    context "when the absent tree has not been created" do
+      it "does delegate to Nothing" do
+        expect(absent_tree.hash).to be Sycamore::Nothing.hash
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree.hash ).to be Sycamore::Tree[:something].hash
+      it "does delegate to the created tree" do
+        expect(absent_tree.hash).to be Sycamore::Tree[:something].hash
       end
     end
   end
@@ -467,75 +466,75 @@ describe Sycamore::Absence do
   # Conversion
   ############################################################################
 
-  describe '#to_s' do
-    context 'when the absent tree has not been created' do
-      it 'does delegate to Nothing' do
-        expect( absent_tree.to_s ).to eql Sycamore::Nothing.to_s
+  describe "#to_s" do
+    context "when the absent tree has not been created" do
+      it "does delegate to Nothing" do
+        expect(absent_tree.to_s).to eql Sycamore::Nothing.to_s
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree.to_s ).to eql Sycamore::Tree[:something].to_s
+      it "does delegate to the created tree" do
+        expect(absent_tree.to_s).to eql Sycamore::Tree[:something].to_s
       end
     end
   end
 
   ############################################################################
 
-  describe '#inspect' do
-    shared_examples_for 'every inspect string' do |absent_tree|
-      context 'when the absent tree has not been created' do
+  describe "#inspect" do
+    shared_examples_for "every inspect string" do |absent_tree|
+      context "when the absent tree has not been created" do
         it 'contains the word "absent"' do
-          expect( absent_tree.inspect ).to include 'absent child of'
+          expect(absent_tree.inspect).to include "absent child of"
         end
       end
 
-      context 'when the absent tree has been created' do
+      context "when the absent tree has been created" do
         before(:each) { absent_tree.add :something }
 
         it 'contains the word "present"' do
-          expect( absent_tree.inspect ).to include 'present child of'
+          expect(absent_tree.inspect).to include "present child of"
         end
       end
 
-      it 'contains the inspect representation of the parent tree' do
-        expect( absent_tree.inspect ).to include absent_tree.instance_variable_get(:@parent_tree).inspect
+      it "contains the inspect representation of the parent tree" do
+        expect(absent_tree.inspect).to include absent_tree.instance_variable_get(:@parent_tree).inspect
       end
 
-      it 'contains the inspect representation of the parent node' do
-        expect( absent_tree.inspect ).to include absent_tree.instance_variable_get(:@parent_node).inspect
+      it "contains the inspect representation of the parent node" do
+        expect(absent_tree.inspect).to include absent_tree.instance_variable_get(:@parent_node).inspect
       end
     end
 
-    include_examples 'every inspect string', Sycamore::Absence.new(Sycamore::Tree.new, :missing)
-    include_examples 'every inspect string', Sycamore::Absence.new(Sycamore::Tree[1,2,3], :missing)
+    include_examples "every inspect string", Sycamore::Absence.new(Sycamore::Tree.new, :missing)
+    include_examples "every inspect string", Sycamore::Absence.new(Sycamore::Tree[1, 2, 3], :missing)
   end
 
   ############################################################################
   # Standard Ruby methods
   ############################################################################
 
-  describe '#dup' do
-    context 'when the absent tree has not been created' do
-      it 'does raise an error' do
+  describe "#dup" do
+    context "when the absent tree has not been created" do
+      it "does raise an error" do
         expect { absent_tree.dup }.to raise_error TypeError
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
       let(:created_tree) { absent_tree.presence }
 
-      it 'does return a duplicate of the present tree, not the Absence' do
+      it "does return a duplicate of the present tree, not the Absence" do
         duplicate = absent_tree.dup
         expect(duplicate).not_to be_a Sycamore::Absence
         expect(duplicate).to be_a Sycamore::Tree
       end
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(created_tree).to be_present
         expect(created_tree).to receive(:dup)
         absent_tree.dup
@@ -545,24 +544,24 @@ describe Sycamore::Absence do
 
   ############################################################################
 
-  describe '#clone' do
-    context 'when the absent tree has not been created' do
-      it 'does raise an error' do
+  describe "#clone" do
+    context "when the absent tree has not been created" do
+      it "does raise an error" do
         expect { absent_tree.clone }.to raise_error TypeError
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
       let(:created_tree) { absent_tree.presence }
 
-      it 'does return a duplicate of the present tree, not the Absence' do
+      it "does return a duplicate of the present tree, not the Absence" do
         klone = absent_tree.clone
         expect(klone).not_to be_a Sycamore::Absence
         expect(klone).to be_a Sycamore::Tree
       end
 
-      it 'does delegate to the created tree' do
+      it "does delegate to the created tree" do
         expect(created_tree).to be_present
         expect(created_tree).to receive(:clone)
         absent_tree.clone
@@ -572,20 +571,19 @@ describe Sycamore::Absence do
 
   ############################################################################
 
-  describe '#frozen?' do
-    context 'when the absent tree has not been created' do
-      it 'does return false' do
-        expect( absent_tree ).not_to be_frozen
+  describe "#frozen?" do
+    context "when the absent tree has not been created" do
+      it "does return false" do
+        expect(absent_tree).not_to be_frozen
       end
     end
 
-    context 'when the absent tree has been created' do
+    context "when the absent tree has been created" do
       before(:each) { absent_tree.add :something }
 
-      it 'does delegate to the created tree' do
-        expect( absent_tree ).not_to be_frozen
+      it "does delegate to the created tree" do
+        expect(absent_tree).not_to be_frozen
       end
     end
   end
-
 end

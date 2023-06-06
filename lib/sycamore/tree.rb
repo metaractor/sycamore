@@ -1,12 +1,10 @@
 module Sycamore
-
   ##
   # A tree data structure as a recursively nested set of {#nodes nodes} of immutable values.
   #
   # See {file:README.md} for a general introduction.
   #
   class Tree
-
     include Enumerable
 
     # the internal hash representation of this tree
@@ -19,11 +17,11 @@ module Sycamore
 
     # the names of all command methods, which add elements to a Tree
     ADDITIVE_COMMAND_METHODS = %i[add << replace add_node_with_empty_child
-       clear_child_of_node] << :[]=
+      clear_child_of_node] << :[]=
 
     # the names of all command methods, which delete elements from a Tree
     DESTRUCTIVE_COMMAND_METHODS = %i[delete >> clear compact replace
-        clear_child_of_node] << :[]=
+      clear_child_of_node] << :[]=
 
     # the names of all additive command methods, which only add elements from a Tree
     PURE_ADDITIVE_COMMAND_METHODS = ADDITIVE_COMMAND_METHODS - DESTRUCTIVE_COMMAND_METHODS
@@ -38,21 +36,21 @@ module Sycamore
     # the names of all query methods, which return a boolean
     PREDICATE_METHODS =
       %i[nothing? absent? existent? present? blank? empty?
-         include? include_node? member? key? has_key? include_path? path? >= > < <=
-         leaf? leaves? internal? external? flat? nested?
-         sleaf? sleaves? strict_leaf? strict_leaves?
-         eql? matches? === ==]
+        include? include_node? member? key? has_key? include_path? path? >= > < <=
+        leaf? leaves? internal? external? flat? nested?
+        sleaf? sleaves? strict_leaf? strict_leaves?
+        eql? matches? === ==]
 
     # the names of all methods, which side-effect-freeze return only a value
     QUERY_METHODS = PREDICATE_METHODS +
       %i[new_child dup hash to_native_object to_h to_s inspect
-         node node! nodes keys child_of child_at dig fetch fetch_path search
-         size total_size tsize height
-         each each_path paths each_node each_key each_pair] << :[]
+        node node! nodes keys child_of child_at dig fetch fetch_path search
+        size total_size tsize height
+        each each_path paths each_node each_key each_pair] << :[]
 
     %i[COMMAND_METHODS QUERY_METHODS PREDICATE_METHODS
-       ADDITIVE_COMMAND_METHODS DESTRUCTIVE_COMMAND_METHODS
-       PURE_ADDITIVE_COMMAND_METHODS PURE_DESTRUCTIVE_COMMAND_METHODS]
+      ADDITIVE_COMMAND_METHODS DESTRUCTIVE_COMMAND_METHODS
+      PURE_ADDITIVE_COMMAND_METHODS PURE_DESTRUCTIVE_COMMAND_METHODS]
       .each do |method_set|
         define_singleton_method(method_set.downcase) { const_get method_set }
       end
@@ -68,7 +66,7 @@ module Sycamore
     end
 
     protected def data
-      @data ||= Hash.new
+      @data ||= {}
     end
 
     protected def clear_data
@@ -89,13 +87,13 @@ module Sycamore
     #
     def self.with(*args)
       tree = new
-      tree.add( args.size == 1 ? args.first : args ) unless args.empty?
+      tree.add((args.size == 1) ? args.first : args) unless args.empty?
       tree
     end
 
     class << self
-      alias from with
-      alias [] with
+      alias_method :from, :with
+      alias_method :[], :with
     end
 
     ##
@@ -114,7 +112,6 @@ module Sycamore
     def new_child(parent_node, *args)
       self.class.new(*args)
     end
-
 
     ########################################################################
     # @group Absence and Nothing predicates
@@ -144,7 +141,7 @@ module Sycamore
     # @return [Boolean]
     #
     def existent?
-      not absent?
+      !absent?
     end
 
     ##
@@ -157,9 +154,8 @@ module Sycamore
     # @return [Boolean]
     #
     def present?
-      not blank?
+      !blank?
     end
-
 
     ########################################################################
     # @group Element access
@@ -208,21 +204,24 @@ module Sycamore
     #   tree.to_h  # => {:foo=>{:bar=>[:baz, 1], :qux=>2}}
     #
     def add(nodes_or_tree)
-      case
-        when nodes_or_tree.equal?(Nothing) then # do nothing
-        when nodes_or_tree.is_a?(Tree)     then add_tree(nodes_or_tree)
-        when Tree.like?(nodes_or_tree)     then add_tree(valid_tree! nodes_or_tree)
-        when nodes_or_tree.is_a?(Path)     then add_path(nodes_or_tree)
-        when nodes_or_tree.is_a?(Enumerable)
-          nodes_or_tree.all? { |node| valid_node_element! node }
-          nodes_or_tree.each { |node| add(node) }
-        else add_node(nodes_or_tree)
+      if nodes_or_tree.equal?(Nothing) # do nothing
+      elsif nodes_or_tree.is_a?(Tree)
+        add_tree(nodes_or_tree)
+      elsif Tree.like?(nodes_or_tree)
+        add_tree(valid_tree!(nodes_or_tree))
+      elsif nodes_or_tree.is_a?(Path)
+        add_path(nodes_or_tree)
+      elsif nodes_or_tree.is_a?(Enumerable)
+        nodes_or_tree.all? { |node| valid_node_element! node }
+        nodes_or_tree.each { |node| add(node) }
+      else
+        add_node(nodes_or_tree)
       end
 
       self
     end
 
-    alias << add
+    alias_method :<<, :add
 
     protected def add_node(node)
       data[node] ||= Nothing
@@ -319,21 +318,23 @@ module Sycamore
     #   tree.to_h  # => {foo: :qux}
     #
     def delete(nodes_or_tree)
-      case
-        when nodes_or_tree.is_a?(Tree) then delete_tree(nodes_or_tree)
-        when Tree.like?(nodes_or_tree) then delete_tree(valid_tree! nodes_or_tree)
-        when nodes_or_tree.is_a?(Path) then delete_path(nodes_or_tree)
-        when nodes_or_tree.is_a?(Enumerable)
-          nodes_or_tree.all? { |node| valid_node_element! node }
-          nodes_or_tree.each { |node| delete node }
-        else
-          delete_node valid_node!(nodes_or_tree)
+      if nodes_or_tree.is_a?(Tree)
+        delete_tree(nodes_or_tree)
+      elsif Tree.like?(nodes_or_tree)
+        delete_tree(valid_tree!(nodes_or_tree))
+      elsif nodes_or_tree.is_a?(Path)
+        delete_path(nodes_or_tree)
+      elsif nodes_or_tree.is_a?(Enumerable)
+        nodes_or_tree.all? { |node| valid_node_element! node }
+        nodes_or_tree.each { |node| delete node }
+      else
+        delete_node valid_node!(nodes_or_tree)
       end
 
       self
     end
 
-    alias >> delete
+    alias_method :>>, :delete
 
     protected def delete_node(node)
       data.delete(node)
@@ -344,19 +345,19 @@ module Sycamore
     protected def delete_tree(tree)
       tree.each do |node_to_delete, child_to_delete|
         next unless include? node_to_delete
-        if Nothing.like?(child_to_delete) or
-            (child_to_delete.respond_to?(:empty?) and child_to_delete.empty?)
+        if Nothing.like?(child_to_delete) ||
+            (child_to_delete.respond_to?(:empty?) && child_to_delete.empty?)
           delete_node node_to_delete
         else
           fetch(node_to_delete, Nothing).tap do |child|
-            case
-              when child.empty? then next
-              when Tree.like?(child_to_delete)
-                child.delete_tree(child_to_delete)
-              when child_to_delete.is_a?(Enumerable)
-                child_to_delete.each { |node| child.delete_node node }
-              else
-                child.delete_node child_to_delete
+            if child.empty?
+              next
+            elsif Tree.like?(child_to_delete)
+              child.delete_tree(child_to_delete)
+            elsif child_to_delete.is_a?(Enumerable)
+              child_to_delete.each { |node| child.delete_node node }
+            else
+              child.delete_node child_to_delete
             end
             delete_node(node_to_delete) if child.empty?
           end
@@ -368,13 +369,13 @@ module Sycamore
 
     protected def delete_path(path)
       case path.length
-        when 0 then return self
-        when 1 then return delete_node(path.node)
+      when 0 then return self
+      when 1 then return delete_node(path.node)
       end
 
       parent = fetch_path(path.parent) { return self }
       parent.delete_node(path.node)
-      delete_path(path.parent) if parent.empty? and not path.parent.root?
+      delete_path(path.parent) if parent.empty? && !path.parent.root?
 
       self
     end
@@ -472,7 +473,7 @@ module Sycamore
     #
     def []=(*args)
       path, nodes_or_tree = args[0..-2], args[-1]
-      raise ArgumentError, 'wrong number of arguments (given 1, expected 2)' if path.empty?
+      raise ArgumentError, "wrong number of arguments (given 1, expected 2)" if path.empty?
 
       if Nothing.like? nodes_or_tree
         if path.size == 1
@@ -516,16 +517,18 @@ module Sycamore
     #   tree.to_h  # => {foo: :bar}
     #
     def compact
-      data.each do |node, child| case
-          when child.nothing? then next
-          when child.empty?   then clear_child_of_node(node)
-          else child.compact
+      data.each do |node, child|
+        if child.nothing?
+          next
+        elsif child.empty?
+          clear_child_of_node(node)
+        else
+          child.compact
         end
       end
 
       self
     end
-
 
     #####################
     #   query methods   #
@@ -545,8 +548,7 @@ module Sycamore
       data.keys
     end
 
-    alias keys nodes  # Hash compatibility
-
+    alias_method :keys, :nodes  # Hash compatibility
 
     ##
     # The only node of this tree or an exception, if more {#nodes nodes} present.
@@ -587,7 +589,7 @@ module Sycamore
     # @see Tree#node
     #
     def node!
-      raise EmptyNodeSet, 'no node present' if empty?
+      raise EmptyNodeSet, "no node present" if empty?
       node
     end
 
@@ -640,21 +642,21 @@ module Sycamore
     def child_at(*path)
       first = path.first
       case path.length
-        when 0
-          raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
-        when 1
-          if first.is_a? Enumerable
-            child_at(*first)
-          else
-            child_of(*path)
-          end
+      when 0
+        raise ArgumentError, "wrong number of arguments (given 0, expected 1+)"
+      when 1
+        if first.is_a? Enumerable
+          child_at(*first)
         else
-          child_of(first).child_at(*path[1..-1])
+          child_of(*path)
+        end
+      else
+        child_of(first).child_at(*path[1..])
       end
     end
 
-    alias [] child_at
-    alias dig child_at  # Hash compatibility
+    alias_method :[], :child_at
+    alias_method :dig, :child_at  # Hash compatibility
 
     ##
     # The child tree of a node.
@@ -693,10 +695,12 @@ module Sycamore
 
       child = data.fetch(node, *default, &block)
       if child.equal? Nothing
-        child = case
-          when block_given?    then yield
-          when !default.empty? then default.first
-          else raise ChildError, "node #{node.inspect} has no child tree"
+        child = if block
+          yield
+        elsif !default.empty?
+          default.first
+        else
+          raise ChildError, "node #{node.inspect} has no child tree"
         end
       end
 
@@ -727,10 +731,10 @@ module Sycamore
     #   tree.fetch_path([:foo, :bar, :baz], :default)  # => :default
     #
     def fetch_path(path, *default, &block)
-      default_case = block_given? || !default.empty?
+      default_case = block || !default.empty?
       path.inject(self) do |tree, node|
         if default_case
-          tree.fetch(node) { return block_given? ? yield : default.first }
+          tree.fetch(node) { return block ? yield : default.first }
         else
           tree.fetch(node)
         end
@@ -759,14 +763,14 @@ module Sycamore
     #   > b
     #
     def each_node(&block)
-      return enum_for(__callee__) unless block_given?
+      return enum_for(__callee__) unless block
 
       data.each_key(&block)
 
       self
     end
 
-    alias each_key each_node  # Hash compatibility
+    alias_method :each_key, :each_node  # Hash compatibility
 
     ##
     # Iterates over all {#nodes nodes} and their child trees.
@@ -788,14 +792,14 @@ module Sycamore
     #   > b => #<Tree: Nothing>
     #
     def each_pair(&block)
-      return enum_for(__callee__) unless block_given?
+      return enum_for(__callee__) unless block
 
       data.each_pair(&block)
 
       self
     end
 
-    alias each each_pair
+    alias_method :each, :each_pair
 
     ##
     # Iterates over the {Path paths} to all leaves of this tree.
@@ -818,7 +822,7 @@ module Sycamore
     #   > #<Path: /b/foo/baz>
     #
     def each_path(with_ancestor: Path::ROOT, &block)
-      return enum_for(__callee__) unless block_given?
+      return enum_for(__callee__) unless block
 
       each do |node, child|
         if child.empty?
@@ -831,7 +835,7 @@ module Sycamore
       self
     end
 
-    alias paths each_path
+    alias_method :paths, :each_path
 
     ##
     # Checks if a path of nodes exists in this tree.
@@ -848,9 +852,9 @@ module Sycamore
     #
     def include_path?(*args)
       case args.count
-        when 0 then raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)'
-        when 1 then path = args.first
-               else return include_path?(args)
+      when 0 then raise ArgumentError, "wrong number of arguments (given 0, expected 1+)"
+      when 1 then path = args.first
+      else return include_path?(args)
       end
       path = [path] unless path.is_a? Enumerable
 
@@ -861,7 +865,7 @@ module Sycamore
       end
     end
 
-    alias path? include_path?
+    alias_method :path?, :include_path?
 
     ##
     # Checks if a node exists in the {#nodes nodes} set of this tree.
@@ -880,9 +884,9 @@ module Sycamore
       data.include?(node)
     end
 
-    alias member?  include_node?  # Hash compatibility
-    alias has_key? include_node?  # Hash compatibility
-    alias key?     include_node?  # Hash compatibility
+    alias_method :member?, :include_node?  # Hash compatibility
+    alias_method :has_key?, :include_node?  # Hash compatibility
+    alias_method :key?, :include_node?  # Hash compatibility
 
     ##
     # Checks if some nodes or a full tree-like structure is included in this tree.
@@ -899,24 +903,23 @@ module Sycamore
     #   tree.include?("a", "b" => 200)     # => true
     #
     def include?(*elements)
-      raise ArgumentError, 'wrong number of arguments (given 0, expected 1+)' if
+      raise ArgumentError, "wrong number of arguments (given 0, expected 1+)" if
         elements.size == 0
       return elements.all? { |element| include? element } if
         elements.size > 1
 
       elements = elements.first
-      case
-        when Tree.like?(elements)
-          elements.all? do |node, child|
-            include_node?(node) and ( child.nil? or child.equal?(Nothing) or
-                                        self.child_of(node).include?(child) )
-          end
-        when elements.is_a?(Path)
-          include_path? elements
-        when elements.is_a?(Enumerable)
-          elements.all? { |element| include_node? element }
-        else
-          include_node? elements
+      if Tree.like?(elements)
+        elements.all? do |node, child|
+          include_node?(node) and (child.nil? or child.equal?(Nothing) or
+                                      child_of(node).include?(child))
+        end
+      elsif elements.is_a?(Path)
+        include_path? elements
+      elsif elements.is_a?(Enumerable)
+        elements.all? { |element| include_node? element }
+      else
+        include_node? elements
       end
     end
 
@@ -941,7 +944,7 @@ module Sycamore
     protected def _search(query, current_path: Path::ROOT, results: [])
       results << current_path if include?(query)
       each do |node, child|
-        child._search(query, current_path: current_path/node, results: results)
+        child._search(query, current_path: current_path / node, results: results)
       end
       results
     end
@@ -982,7 +985,7 @@ module Sycamore
       total
     end
 
-    alias tsize total_size
+    alias_method :tsize, :total_size
 
     ##
     # The length of the longest path of this tree.
@@ -1011,7 +1014,7 @@ module Sycamore
       data.empty?
     end
 
-    alias blank? empty?
+    alias_method :blank?, :empty?
 
     ##
     # Checks if the given node has no children.
@@ -1047,7 +1050,7 @@ module Sycamore
       include_node?(node) && child_at(node).absent?
     end
 
-    alias sleaf? strict_leaf?
+    alias_method :sleaf?, :strict_leaf?
 
     ##
     # Checks if all given nodes or that of the tree have no children, even not an empty child tree.
@@ -1076,7 +1079,7 @@ module Sycamore
       nodes.all? { |node| strict_leaf?(node) }
     end
 
-    alias sleaves? strict_leaves?
+    alias_method :sleaves?, :strict_leaves?
 
     ##
     # Checks if all given nodes or that of the tree have no children.
@@ -1105,8 +1108,8 @@ module Sycamore
       nodes.all? { |node| leaf?(node) }
     end
 
-    alias leaves? external?
-    alias flat? external?
+    alias_method :leaves?, :external?
+    alias_method :flat?, :external?
 
     ##
     # Checks if all given nodes or that of the tree have children.
@@ -1134,14 +1137,13 @@ module Sycamore
     #   One would expect it to be the negation of #external? without arguments.
     #
     def internal?(*nodes)
-      return false if self.empty?
+      return false if empty?
       nodes = self.nodes if nodes.empty?
 
-      nodes.all? { |node| not leaf?(node) and include_node?(node) }
+      nodes.all? { |node| !leaf?(node) and include_node?(node) }
     end
 
-    alias nested? internal?
-
+    alias_method :nested?, :internal?
 
     ########################################################################
     # @group Comparison
@@ -1246,7 +1248,7 @@ module Sycamore
     #   tree1 >= tree1  # => true
     #
     def >=(other)
-      (other.is_a?(Tree) or other.is_a?(Absence)) and self.include?(other)
+      (other.is_a?(Tree) or other.is_a?(Absence)) and include?(other)
     end
 
     ##
@@ -1263,7 +1265,7 @@ module Sycamore
     #   tree1 > tree1  # => false
     #
     def >(other)
-      (other.is_a?(Tree) or other.is_a?(Absence)) and self.include?(other) and self != other
+      (other.is_a?(Tree) or other.is_a?(Absence)) and include?(other) and self != other
     end
 
     ##
@@ -1281,17 +1283,19 @@ module Sycamore
     #   Problem: Requires a solution which doesn't use +Hash#include?+.
     #
     def matches?(other)
-      case
-        when Tree.like?(other)       then matches_tree?(other)
-        when other.is_a?(Enumerable) then matches_enumerable?(other)
-                                     else matches_atom?(other)
+      if Tree.like?(other)
+        matches_tree?(other)
+      elsif other.is_a?(Enumerable)
+        matches_enumerable?(other)
+      else
+        matches_atom?(other)
       end
     end
 
-    alias === matches?
+    alias_method :===, :matches?
 
     private def matches_atom?(other)
-      not other.nil? and (size == 1 and nodes.first == other and leaf? other)
+      !other.nil? and (size == 1 and nodes.first == other and leaf? other)
     end
 
     private def matches_enumerable?(other)
@@ -1304,14 +1308,14 @@ module Sycamore
         all? { |node, child|
           if child.nothing?
             other.include?(node) and begin other_child = other.fetch(node, nil)
-              not other_child or
-                (other_child.respond_to?(:empty?) and other_child.empty?)
+                                           !other_child or
+                                             (other_child.respond_to?(:empty?) and other_child.empty?)
             end
           else
             child.matches? other[node]
-          end }
+          end
+        }
     end
-
 
     ########################################################################
     # @group Conversion
@@ -1325,13 +1329,12 @@ module Sycamore
     # @api private
     #
     def to_native_object(sleaf_child_as: nil, special_nil: false)
-      case
-        when empty?
-          []
-        when strict_leaves?
-          size == 1 && (!special_nil || !nodes.first.nil?) ? nodes.first : nodes
-        else
-          to_h(sleaf_child_as: sleaf_child_as, special_nil: special_nil)
+      if empty?
+        []
+      elsif strict_leaves?
+        (size == 1 && (!special_nil || !nodes.first.nil?)) ? nodes.first : nodes
+      else
+        to_h(sleaf_child_as: sleaf_child_as, special_nil: special_nil)
       end
     end
 
@@ -1392,11 +1395,10 @@ module Sycamore
     #
     private def valid_node_element!(node)
       raise InvalidNode, "#{node} is not a valid tree node" if
-        node.is_a?(Enumerable) and not node.is_a?(Path) and not Tree.like?(node)
+        node.is_a?(Enumerable) && !node.is_a?(Path) && !Tree.like?(node)
 
       node
     end
-
 
     # @api private
     #
@@ -1420,15 +1422,15 @@ module Sycamore
     #
     def self.tree_like?(object)
       case object
-        when Hash, Tree, Absence # ... ?!
-          true
-        else
-          (object.respond_to? :tree_like? and object.tree_like?) # or ...
+      when Hash, Tree, Absence # ... ?!
+        true
+      else
+        (object.respond_to? :tree_like? and object.tree_like?) # or ...
       end
     end
 
     class << self
-      alias like? tree_like?
+      alias_method :like?, :tree_like?
     end
 
     ########################################################################
@@ -1441,8 +1443,7 @@ module Sycamore
     # @return [Tree]
     #
     def dup
-      duplicate = self.class.new.add(self)
-      duplicate
+      self.class.new.add(self)
     end
 
     ##
@@ -1464,6 +1465,5 @@ module Sycamore
       each { |_, child| child.freeze }
       super
     end
-
   end  # Tree
 end  # Sycamore

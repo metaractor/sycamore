@@ -1,4 +1,4 @@
-require 'sycamore'
+require "sycamore"
 
 # optional global shortcut constant for Sycamore::Path
 Path = Sycamore::Path

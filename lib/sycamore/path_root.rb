@@ -1,4 +1,4 @@
-require 'singleton'
+require "singleton"
 
 module Sycamore
   class Path
@@ -25,16 +25,16 @@ module Sycamore
         0
       end
 
-      def join(delimiter = '/')
-        ''
+      def join(delimiter = "/")
+        ""
       end
 
       def to_s
-        '#<Path:Root>'
+        "#<Path:Root>"
       end
 
       def inspect
-        '#<Sycamore::Path::Root>'
+        "#<Sycamore::Path::Root>"
       end
     end
 

@@ -1,7 +1,6 @@
-require 'singleton'
+require "singleton"
 
 module Sycamore
-
   ##
   # The Nothing Tree singleton class.
   #
@@ -43,7 +42,7 @@ module Sycamore
     # TODO: YARD should be informed about this method definitions.
     command_methods.each do |command_method|
       define_method command_method do |*args|
-        raise NothingMutation, 'attempt to change the Nothing tree'
+        raise NothingMutation, "attempt to change the Nothing tree"
       end
     end
 
@@ -66,7 +65,7 @@ module Sycamore
     # @return [String]
     #
     def to_s
-      'Tree[Nothing]'
+      "Tree[Nothing]"
     end
 
     ##
@@ -75,7 +74,7 @@ module Sycamore
     # @return [String]
     #
     def inspect
-      '#<Sycamore::Nothing>'
+      "#<Sycamore::Nothing>"
     end
 
     def freeze
@@ -94,7 +93,6 @@ module Sycamore
     def ==(other)
       (other.is_a?(Tree) or other.is_a?(Absence)) and other.empty?
     end
-
 
     ########################################################################
     # Falsiness
@@ -119,7 +117,6 @@ module Sycamore
     #   true
     # end
 
-
     ########################################################################
     # Some helpers
     #
@@ -139,19 +136,17 @@ module Sycamore
       include Singleton
 
       def inspect
-        'n/a'
+        "n/a"
       end
     end
 
     ##
     # @api private
     NestedString = NestedStringPresentation.instance.freeze
-
   end
 
   ############################################################################
   # The Nothing Tree Singleton object
   #
   Nothing = NothingTree.instance.freeze
-
 end

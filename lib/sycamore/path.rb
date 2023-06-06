@@ -1,7 +1,6 @@
-require 'forwardable'
+require "forwardable"
 
 module Sycamore
-
   ##
   # A compact, immutable representation of Tree paths, i.e. node sequences.
   #
@@ -62,7 +61,7 @@ module Sycamore
     #
     def self.of(*args)
       if (parent = args.first).is_a? Path
-        parent.branch(*args[1..-1])
+        parent.branch(*args[1..])
       else
         root.branch(*args)
       end
@@ -71,7 +70,7 @@ module Sycamore
     class << self
       private :new  # disable Path.new
 
-      alias [] of
+      alias_method :[], :of
     end
 
     ########################################################################
@@ -96,7 +95,7 @@ module Sycamore
     #     Sycamore::Path[:foo, :bar, :baz, :qux]  # => true
     #
     def branch(*nodes)
-      return branch(*nodes.first) if nodes.size == 1 and nodes.first.is_a? Enumerable
+      return branch(*nodes.first) if nodes.size == 1 && nodes.first.is_a?(Enumerable)
 
       parent = self
       nodes.each do |node|
@@ -108,8 +107,8 @@ module Sycamore
       parent
     end
 
-    alias + branch
-    alias / branch
+    alias_method :+, :branch
+    alias_method :/, :branch
 
     ##
     # @return [Path] the n-th last parent path
@@ -126,9 +125,9 @@ module Sycamore
         distance.is_a? Integer
 
       case distance
-        when 1 then @parent
-        when 0 then self
-        else parent.up(distance - 1)
+      when 1 then @parent
+      when 0 then self
+      else parent.up(distance - 1)
       end
     end
 
@@ -148,7 +147,7 @@ module Sycamore
       i
     end
 
-    alias size length
+    alias_method :size, :length
 
     ##
     # Iterates over all nodes on this path.
@@ -160,7 +159,7 @@ module Sycamore
     #   @return [Enumerator<node>]
     #
     def each_node(&block)
-      return enum_for(__callee__) unless block_given?
+      return enum_for(__callee__) unless block
 
       if @parent
         @parent.each_node(&block)
@@ -168,7 +167,7 @@ module Sycamore
       end
     end
 
-    alias each each_node
+    alias_method :each, :each_node
 
     ##
     # If a given structure contains this path.
@@ -184,18 +183,18 @@ module Sycamore
     def present_in?(struct)
       each do |node|
         case
-          when struct.is_a?(Enumerable)
-            return false unless struct.include? node
-            struct = (Tree.like?(struct) ? struct[node] : Nothing )
-          else
-            return false unless struct.eql? node
-            struct = Nothing
+        when struct.is_a?(Enumerable)
+          return false unless struct.include? node
+          struct = (Tree.like?(struct) ? struct[node] : Nothing)
+        else
+          return false unless struct.eql? node
+          struct = Nothing
         end
       end
       true
     end
 
-    alias in? present_in?
+    alias_method :in?, :present_in?
 
     ########################################################################
     # @group Equality
@@ -214,8 +213,8 @@ module Sycamore
     #
     def eql?(other)
       other.is_a?(self.class) and
-        self.length == other.length and begin
-          i = other.each ; all? { |node| node.eql? i.next }
+        length == other.length and begin
+          i = other.each; all? { |node| node.eql? i.next }
         end
     end
 
@@ -224,8 +223,8 @@ module Sycamore
     # @param other [Object]
     #
     def ==(other)
-      other.is_a?(Enumerable) and self.length == other.length and begin
-        i = other.each ; all? { |node| node == i.next }
+      other.is_a?(Enumerable) and length == other.length and begin
+        i = other.each; all? { |node| node == i.next }
       end
     end
 
@@ -244,7 +243,7 @@ module Sycamore
     #   Sycamore::Path[1,2,3].join       # => '/1/2/3'
     #   Sycamore::Path[1,2,3].join('|')  # => '|1|2|3'
     #
-    def join(separator = '/')
+    def join(separator = "/")
       @parent.join(separator) + separator + node.to_s
     end
 
@@ -259,8 +258,7 @@ module Sycamore
     # @return [String] a more verbose string representation of this path
     #
     def inspect
-      "#<Sycamore::Path[#{each_node.map(&:inspect).join(',')}]>"
+      "#<Sycamore::Path[#{each_node.map(&:inspect).join(",")}]>"
     end
   end
-
 end
